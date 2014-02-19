@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'ipscriptables/cli'
+
+IPScriptables::CLI.run

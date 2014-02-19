@@ -43,13 +43,11 @@ module IPScriptables
       end
 
       def from_iptables(opts={})
-        # FIXME: -c
-        from_command('iptables-save', opts.merge(family: :inet))
+        from_command('iptables-save', '-c', opts.merge(family: :inet))
       end
 
       def from_ip6tables(opts={})
-        # FIXME: -c
-        from_command('ip6tables-save', opts.merge(family: :inet6))
+        from_command('ip6tables-save', '-c', opts.merge(family: :inet6))
       end
     end
   end

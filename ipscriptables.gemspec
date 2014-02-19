@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'sigar'   # for OHAI's network_listeners plugin
   spec.add_dependency 'ipaddr_extensions' # for OHAI's ip_scopes plugin
   spec.add_dependency 'diffy'
+  spec.add_dependency 'clamp'
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "minitest"
