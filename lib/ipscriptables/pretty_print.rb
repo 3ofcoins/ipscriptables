@@ -26,7 +26,19 @@ module IPScriptables
       q.group(2, "#{render_header} {", "}") do
         unless rules.empty?
           q.breakable
-          q.seplist(rules, ->{ q.breakable " ; " } ) { |v| q.text v }
+          q.seplist(rules, ->{ q.breakable " ; " } ) { |v| q.pp(v) }
+        end
+      end
+    end
+  end
+
+  class Rule
+    def pretty_print(q)
+      q.text("#{render_counters}#{rule}")
+      q.group(2, "#{render_header} {", "}") do
+        unless rules.empty?
+          q.breakable
+          q.seplist(rules, ->{ q.breakable " ; " } ) { |v| q.pp(v) }
         end
       end
     end

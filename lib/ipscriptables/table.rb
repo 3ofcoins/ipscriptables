@@ -16,6 +16,10 @@ module IPScriptables
       Docile.dsl_eval(self, &block) if block_given?
     end
 
+    def original
+      ruleset.original[name] if ruleset.original
+    end
+
     def create_builtin_chains
       # initalize builtin chains
       case @name

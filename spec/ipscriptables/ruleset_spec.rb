@@ -14,33 +14,10 @@ module IPScriptables
     end
   end
 
-  describe "Ruleset#initialize" do
-    it "allows to create rulesets with a DSL" do
-      rs = Ruleset.new do
-        table :filter do
-          chain :INPUT do
-            rule '-p tcp -m tcp --dport 22 -j ACCEPT'
-            rule '-j REJECT --reject-with icmp-port-unreachable'
-          end
-        end
-      end
-
-      expected_rules = <<-EOF
-*filter
-:INPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
--A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp-port-unreachable
-COMMIT
-        EOF
-
-      expect { rs.render == expected_rules }
-    end
-  end
-
   describe "Ruleset#bud" do
     let(:drumknott) { Ruleset.from_file(fixture("drumknott.txt")) }
+    let(:ghq)       { Ruleset.from_file(fixture("ghq.txt")) }
+
     it "creates a child ruleset with identical tables and chains, but no rules" do
       expected_rules = <<-EOF
 *mangle
@@ -101,7 +78,7 @@ COMMIT
 
     it "allows filtering inherited chains" do
       child = drumknott.bud do
-        inherit(:filter, :FWR) { |rule| rule !~ /^-s/ }
+        inherit(:filter, :FWR) { |rule| !rule[:source] }
       end
       expected_rules = <<-EOF
 *mangle
@@ -134,6 +111,47 @@ COMMIT
         EOF
       expect { child.render == expected_rules }
       expect { drumknott.render =~ /^-A FWR -s 1\.1\.1\.1/ }
+    end
+
+    it "copies original's chain with counters" do
+      child = ghq.bud do
+        inherit(:nat, :DOCKER)
+        table :filter do
+          chain :INPUT do
+            rule '-j FWR'
+          end
+          chain :FWR do
+            rule '-i lo -j ACCEPT'
+          end
+        end
+      end
+
+      expected_rules = <<-EOF
+*nat
+:PREROUTING ACCEPT [732601:44001989]
+:INPUT ACCEPT [376018:22538408]
+:OUTPUT ACCEPT [3131507:229597576]
+:POSTROUTING ACCEPT [20476198:1943580383]
+:DOCKER - [0:0]
+[2:120] -A DOCKER ! -i docker0 -p tcp -m tcp --dport 2003 -j DNAT --to-destination 172.17.0.4:2003
+[0:0] -A DOCKER ! -i docker0 -p tcp -m tcp --dport 2004 -j DNAT --to-destination 172.17.0.4:2004
+[0:0] -A DOCKER ! -i docker0 -p tcp -m tcp --dport 49153 -j DNAT --to-destination 172.17.0.8:9000
+[95:5580] -A DOCKER ! -i docker0 -p tcp -m tcp --dport 5000 -j DNAT --to-destination 172.17.0.5:5000
+[0:0] -A DOCKER -d 127.0.0.1/32 ! -i docker0 -p tcp -m tcp --dport 49154 -j DNAT --to-destination 172.17.0.9:8080
+[17011603:1693997647] -A DOCKER ! -i docker0 -p udp -m udp --dport 8125 -j DNAT --to-destination 172.17.0.10:8125
+[0:0] -A DOCKER -d 127.0.0.1/32 ! -i docker0 -p tcp -m tcp --dport 49155 -j DNAT --to-destination 172.17.0.10:8126
+COMMIT
+*filter
+:INPUT ACCEPT [1602:65593]
+:FORWARD ACCEPT [79892700:14079015733]
+:OUTPUT ACCEPT [173177551:46244981637]
+:FWR - [0:0]
+[162824485:36484450187] -A INPUT -j FWR
+[104747465:21902005069] -A FWR -i lo -j ACCEPT
+COMMIT
+      EOF
+
+      expect { child.render == expected_rules }
     end
   end
 end

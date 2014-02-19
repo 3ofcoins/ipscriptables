@@ -10,6 +10,7 @@ module IPScriptables
     include Enumerable
     def_delegators :@tables, :[]=, :[]
     def_delegators :to_ary, :each
+    def_delegators :opts, :original
 
     def initialize(opts={}, &block)
       @tables = Hashie::Mash.new
@@ -46,7 +47,11 @@ module IPScriptables
     end
 
     def table(name, &block)
-      self[name] ||= Table.new(name, self, &block)
+      if @tables.key?(name)
+        Docile.dsl_eval(@tables[name], &block)
+      else
+        self[name] = Table.new(name, self, &block)
+      end
     end
 
     def inherit(table, *names, &block)

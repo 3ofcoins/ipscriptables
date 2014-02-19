@@ -23,8 +23,9 @@ module IPScriptables
             _table = rs.table($1)
           when /^:(\w+) (\w+|-) \[(\d+):(\d+)\]$/
             _table.chain($1, $2, [$3.to_i, $4.to_i])
-          when /^-A (\w+) (.*)/
-            _table[$1] << $2
+          when /^(\[(\d+):(\d+)\] )?-A (\w+) (.*)/
+            ch = _table[$4]
+            ch.rule(Rule.new(ch, $5, ([$2.to_i, $3.to_i] if $1)))
           when /^COMMIT$/
             raise RuntimeError if _table.nil?
             _table = nil
