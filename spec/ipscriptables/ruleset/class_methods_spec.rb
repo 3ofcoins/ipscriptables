@@ -16,7 +16,7 @@ module IPScriptables
   end
 
   describe "Ruleset.from_command" do
-    let(:fixture_text) { File.read(fixture("drumknott.txt")) }
+    let(:fixture_text) { File.read(fixture("ghq.txt")) }
     let(:stripped_fixture) { fixture_text.lines.reject { |ln| ln =~ /^#/ }.join }
 
     it "executes external command and parses its output as ruleset" do
@@ -29,18 +29,18 @@ module IPScriptables
     end
 
     it "has a convenience alias .from_iptables" do
-      Helpers.expects(:run_command).with('iptables-save').returns(fixture_text)
+      Helpers.expects(:run_command).with('iptables-save', '-c').returns(fixture_text)
       rs = Ruleset.from_iptables
       expect { rs.render == stripped_fixture }
-      expect { rs.command == ['iptables-save'] }
+      expect { rs.command == ['iptables-save', '-c'] }
       expect { rs.family == :inet }
     end
 
     it "has a convenience alias .from_ip6tables" do
-      Helpers.expects(:run_command).with('ip6tables-save').returns(fixture_text)
+      Helpers.expects(:run_command).with('ip6tables-save', '-c').returns(fixture_text)
       rs = Ruleset.from_ip6tables
       expect { rs.render == stripped_fixture }
-      expect { rs.command == ['ip6tables-save'] }
+      expect { rs.command == ['ip6tables-save', '-c'] }
       expect { rs.family == :inet6 }
     end
   end

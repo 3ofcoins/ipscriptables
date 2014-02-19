@@ -5,6 +5,7 @@ module IPScriptables
     let(:chain) do
       ch = mock(Chain.name)
       ch.expects(:original).at_least_once.returns(nil)
+      ch.expects(:opts).at_least(0).returns({})
       ch
     end
 
