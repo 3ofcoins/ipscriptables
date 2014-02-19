@@ -1,5 +1,9 @@
 module IPScriptables
   class Ruleset
+    def inspect
+      "#<#{self.class} [#{map(&:inspect).join(', ')}]>"
+    end
+
     def pretty_print(q)
       q.object_address_group(self) do
         q.group(2) do
@@ -11,6 +15,10 @@ module IPScriptables
   end
 
   class Table
+    def inspect
+      "#<#{self.class} #{name} [#{map(&:inspect).join(', ')}]>"
+    end
+
     def pretty_print(q)
       q.group(2, "*#{name} {", "}") do
         unless @chains.empty?
@@ -22,6 +30,10 @@ module IPScriptables
   end
 
   class Chain
+    def inspect
+      "#<#{self.class} #{name} [#{map(&:inspect).join(', ')}]>"
+    end
+
     def pretty_print(q)
       q.group(2, "#{render_header} {", "}") do
         unless rules.empty?
@@ -33,6 +45,10 @@ module IPScriptables
   end
 
   class Rule
+    def inspect
+      "#<#{self.class} #{render_counters}#{rule}>"
+    end
+
     def pretty_print(q)
       q.text("#{render_counters}#{rule}")
     end
