@@ -18,8 +18,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+  spec.add_dependency 'docile'
   spec.add_dependency 'hashie'
   spec.add_dependency 'systemu'
+  spec.add_dependency 'ohai'
+  spec.add_dependency 'sigar'   # for OHAI's network_listeners plugin
+  spec.add_dependency 'ipaddr_extensions' # for OHAI's ip_scopes plugin
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "minitest"
