@@ -5,7 +5,7 @@ module IPScriptables
     attr_reader :name, :table, :rules, :counters
     attr_accessor :policy
     def_delegators :rules, :each, :clear, :<<, :empty?
-    def_delegators :table, :ruleset
+    def_delegators :table, :ruleset, :opts
 
     def initialize(name, table, policy='-', counters=[0,0], &block)
       @name = name

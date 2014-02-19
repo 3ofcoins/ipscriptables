@@ -3,6 +3,7 @@ module IPScriptables
     extend Forwardable
     def_delegators :@chains, :[]=, :[], :keys
     def_delegators :to_ary, :each, :empty?
+    def_delegators :ruleset, :opts
     include Enumerable
 
     attr_reader :name, :ruleset

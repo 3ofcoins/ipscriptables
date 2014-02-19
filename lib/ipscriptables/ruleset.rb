@@ -32,8 +32,8 @@ module IPScriptables
       end
     end
 
-    def bud(&block)
-      child = self.class.new(skip_builtin_chains: true, original: self)
+    def bud(opts={}, &block)
+      child = self.class.new(opts.merge(skip_builtin_chains: true, original: self))
       each do |table|
         child_table = child.table(table.name)
         table.each do |chain|
@@ -65,23 +65,7 @@ module IPScriptables
     end
 
     def diff(from=nil)
-      if from
-        Diffy::Diff.new(from.render, render)
-      else
-        @diff ||= Diffy::Diff.new(original.render, render)
-      end
-    end
-
-    def same?(from=nil)
-      diff(from).to_s.empty?
-    end
-
-    def apply(program)
-      apply!(program) unless original && same?
-
-    def apply!(program)
-      IO.popen(program, 'w') { |program| program.write(self.render) }
-      raise RuntimeError unless $?.success?
+      Diffy::Diff.new((from||original).render, render)
     end
   end
 end

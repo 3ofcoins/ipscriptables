@@ -18,7 +18,9 @@ module IPScriptables
       :dports => :destination_ports
     ].freeze
 
+    extend Forwardable
     attr_reader :chain, :rule, :counters
+    def_delegators :chain, :opts
 
     def initialize(chain, rule, counters = nil)
       @chain = chain
@@ -27,6 +29,7 @@ module IPScriptables
 
       @counters = counters
       @counters ||= original.counters if original
+      @counters ||= [0, 0] if opts[:counters]
 
       _key = nil
       Shellwords.shellsplit(rule).each do |word|
