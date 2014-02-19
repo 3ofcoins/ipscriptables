@@ -1,3 +1,5 @@
+require 'diffy'
+
 require 'ipscriptables/helpers'
 require 'ipscriptables/ruleset/class_methods'
 
@@ -60,6 +62,26 @@ module IPScriptables
 
     def render
       map(&:render).join("\n") << "\n"
+    end
+
+    def diff(from=nil)
+      if from
+        Diffy::Diff.new(from.render, render)
+      else
+        @diff ||= Diffy::Diff.new(original.render, render)
+      end
+    end
+
+    def same?(from=nil)
+      diff(from).to_s.empty?
+    end
+
+    def apply(program)
+      apply!(program) unless original && same?
+
+    def apply!(program)
+      IO.popen(program, 'w') { |program| program.write(self.render) }
+      raise RuntimeError unless $?.success?
     end
   end
 end
