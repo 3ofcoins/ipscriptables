@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = IPScriptables::VERSION
   spec.authors       = ["Maciej Pasternacki"]
   spec.email         = ["maciej@3ofcoins.net"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = 'Ruby-driven IPTables'
+  spec.summary       = 'Ruby-driven IPTables'
   spec.homepage      = "https://github.com/3ofcoins/ipscriptables/"
   spec.license       = "MIT"
 
