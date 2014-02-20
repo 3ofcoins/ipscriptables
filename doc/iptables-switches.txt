@@ -1,0 +1,342 @@
+List of options, targets and modules from man iptables 1.4.12 IPTABLES(8)
+
+       [!] -p, --protocol protocol
+       [!] -s, --source address[/mask][,...]
+       [!] -d, --destination address[/mask][,...]
+       -j, --jump target
+       -g, --goto chain
+       [!] -i, --in-interface name
+       [!] -o, --out-interface name
+       [!] -f, --fragment
+   addrtype
+       [!] --src-type type
+       [!] --dst-type type
+       --limit-iface-in
+       --limit-iface-out
+   ah
+       [!] --ahspi spi[:spi]
+   cluster
+       --cluster-total-nodes num
+       [!] --cluster-local-node num
+       [!] --cluster-local-nodemask mask
+       --cluster-hash-seed value
+   comment
+       --comment comment
+   connbytes
+       [!] --connbytes from[:to]
+       --connbytes-dir {original|reply|both}
+       --connbytes-mode {packets|bytes|avgpkt}
+   connlimit
+       --connlimit-upto n
+       --connlimit-above n
+       --connlimit-mask prefix_length
+       --connlimit-saddr
+       --connlimit-daddr
+   connmark
+       [!] --mark value[/mask]
+   conntrack
+       [!] --ctstate statelist
+       [!] --ctproto l4proto
+       [!] --ctorigsrc address[/mask]
+       [!] --ctorigdst address[/mask]
+       [!] --ctreplsrc address[/mask]
+       [!] --ctrepldst address[/mask]
+       [!] --ctorigsrcport port[:port]
+       [!] --ctorigdstport port[:port]
+       [!] --ctreplsrcport port[:port]
+       [!] --ctrepldstport port[:port]
+       [!] --ctstatus statelist
+       [!] --ctexpire time[:time]
+       --ctdir {ORIGINAL|REPLY}
+   cpu
+       [!] --cpu number
+   dccp
+       [!] --source-port,--sport port[:port]
+       [!] --destination-port,--dport port[:port]
+       [!] --dccp-types mask
+       [!] --dccp-option number
+   dscp
+       [!] --dscp value
+       [!] --dscp-class class
+   ecn
+       [!] --ecn-tcp-cwr
+       [!] --ecn-tcp-ece
+       [!] --ecn-ip-ect num
+   esp
+       [!] --espspi spi[:spi]
+   hashlimit
+       --hashlimit-upto amount[/second|/minute|/hour|/day]
+       --hashlimit-above amount[/second|/minute|/hour|/day]
+       --hashlimit-burst amount
+       --hashlimit-mode {srcip|srcport|dstip|dstport},...
+       --hashlimit-srcmask prefix
+       --hashlimit-dstmask prefix
+       --hashlimit-name foo
+       --hashlimit-htable-size buckets
+       --hashlimit-htable-max entries
+       --hashlimit-htable-expire msec
+       --hashlimit-htable-gcinterval msec
+   helper
+       [!] --helper string
+   icmp
+       [!] --icmp-type {type[/code]|typename}
+   iprange
+       [!] --src-range from[-to]
+       [!] --dst-range from[-to]
+   ipvs
+       [!] --ipvs
+       [!] --vproto protocol
+       [!] --vaddr address[/mask]
+       [!] --vport port
+       --vdir {ORIGINAL|REPLY}
+       [!] --vmethod {GATE|IPIP|MASQ}
+       [!] --vportctl port
+   length
+       [!] --length length[:length]
+   limit
+       --limit rate[/second|/minute|/hour|/day]
+       --limit-burst number
+   mac
+       [!] --mac-source address
+   mark
+       [!] --mark value[/mask]
+   multiport
+       [!] --source-ports,--sports port[,port|,port:port]...
+       [!] --destination-ports,--dports port[,port|,port:port]...
+       [!] --ports port[,port|,port:port]...
+   osf
+       [!] --genre string
+       --ttl level
+       --log level
+   owner
+       [!] --uid-owner username
+       [!] --uid-owner userid[-userid]
+       [!] --gid-owner groupname
+       [!] --gid-owner groupid[-groupid]
+       [!] --socket-exists
+   physdev
+       [!] --physdev-in name
+       [!] --physdev-out name
+       [!] --physdev-is-in
+       [!] --physdev-is-out
+       [!] --physdev-is-bridged
+   pkttype
+       [!] --pkt-type {unicast|broadcast|multicast}
+   policy
+       --dir {in|out}
+       --pol {none|ipsec}
+       --strict
+       [!] --reqid id
+       [!] --spi spi
+       [!] --proto {ah|esp|ipcomp}
+       [!] --mode {tunnel|transport}
+       [!] --tunnel-src addr[/mask]
+       [!] --tunnel-dst addr[/mask]
+       --next Start the next element in the policy specification. Can only  be
+   quota
+       [!] --quota bytes
+   rateest
+       --rateest-delta
+       [!] --rateest-lt
+       [!] --rateest-gt
+       [!] --rateest-eq
+       --rateest name
+       --rateest1 name
+       --rateest2 name
+       --rateest-bps [value]
+       --rateest-pps [value]
+       --rateest-bps1 [value]
+       --rateest-bps2 [value]
+       --rateest-pps1 [value]
+       --rateest-pps2 [value]
+   realm
+       [!] --realm value[/mask]
+   recent
+       --name name
+       [!] --set
+       --rsource
+       --rdest
+       [!] --rcheck
+       [!] --update
+       [!] --remove
+       --seconds seconds
+       --reap reap
+       --hitcount hits
+       --rttl This option may only be used in conjunction with one of --rcheck
+   sctp
+       [!] --source-port,--sport port[:port]
+       [!] --destination-port,--dport port[:port]
+       [!] --chunk-types {all|any|only} chunktype[:flags] [...]
+   set
+       [!] --match-set setname flag[,flag]...
+   socket
+       --transparent
+   state
+       [!] --state state
+   statistic
+       --mode mode
+       [!] --probability p
+       [!] --every n
+       --packet p
+   string
+       --algo {bm|kmp}
+       --from offset
+       --to offset
+       [!] --string pattern
+       [!] --hex-string pattern
+   tcp
+       [!] --source-port,--sport port[:port]
+       [!] --destination-port,--dport port[:port]
+       [!] --tcp-flags mask comp
+       [!] --syn
+       [!] --tcp-option number
+   tcpmss
+       [!] --mss value[:value]
+   time
+       --datestart YYYY[-MM[-DD[Thh[:mm[:ss]]]]]
+       --datestop YYYY[-MM[-DD[Thh[:mm[:ss]]]]]
+       --timestart hh:mm[:ss]
+       --timestop hh:mm[:ss]
+       [!] --monthdays day[,day...]
+       [!] --weekdays day[,day...]
+       --kerneltz
+   tos
+       [!] --tos value[/mask]
+       [!] --tos symbol
+   ttl
+       --ttl-eq ttl
+       --ttl-gt ttl
+       --ttl-lt ttl
+   u32
+       [!] --u32 tests
+   udp
+       [!] --source-port,--sport port[:port]
+       [!] --destination-port,--dport port[:port]
+   unclean
+       malformed or unusual.  This is regarded as experimental.
+TARGET EXTENSIONS
+   AUDIT
+       --type {accept|drop|reject}
+   CHECKSUM
+       --checksum-fill
+   CLASSIFY
+       --set-class major:minor
+   CLUSTERIP
+       --new  Create  a  new  ClusterIP.   You  always have to set this on the
+       --hashmode mode
+       --clustermac mac
+       --total-nodes num
+       --local-node num
+       --hash-init rnd
+   CONNMARK
+       --set-xmark value[/mask]
+       --save-mark [--nfmask nfmask] [--ctmask ctmask]
+       --restore-mark [--nfmask nfmask] [--ctmask ctmask]
+       --and-mark bits
+       --or-mark bits
+       --xor-mark bits
+       --set-mark value[/mask]
+       --save-mark [--mask mask]
+       --restore-mark [--mask mask]
+   CONNSECMARK
+       --save If  the packet has a security marking, copy it to the connection
+       --restore
+   CT
+       --notrack
+       --helper name
+       --ctevents event[,...]
+       --expevents event[,...]
+       --zone id
+   DNAT
+       --to-destination [ipaddr[-ipaddr]][:port[-port]]
+       --random
+       --persistent
+   DSCP
+       --set-dscp value
+       --set-dscp-class class
+   ECN
+       --ecn-tcp-remove
+   IDLETIMER
+       --timeout amount
+       --label string
+   LOG
+       --log-level level
+       --log-prefix prefix
+       --log-tcp-sequence
+       --log-tcp-options
+       --log-ip-options
+       --log-uid
+   MARK
+       --set-xmark value[/mask]
+       --set-mark value[/mask]
+       --and-mark bits
+       --or-mark bits
+       --xor-mark bits
+   MASQUERADE
+       --to-ports port[-port]
+       --random
+   MIRROR
+   NETMAP
+       --to address[/mask]
+   NFLOG
+       --nflog-group nlgroup
+       --nflog-prefix prefix
+       --nflog-range size
+       --nflog-threshold size
+   NFQUEUE
+       --queue-num value
+       --queue-balance value:value
+       --queue-bypass
+   NOTRACK
+   RATEEST
+       --rateest-name name
+       --rateest-interval amount{s|ms|us}
+       --rateest-ewmalog value
+   REDIRECT
+       --to-ports port[-port]
+       --random
+   REJECT
+       --reject-with type
+   SAME
+       --to ipaddr[-ipaddr]
+       --nodst
+       --random
+   SECMARK
+       --selctx security_context
+   SET
+       --add-set setname flag[,flag...]
+       --del-set setname flag[,flag...]
+       --timeout value
+       --exist
+   SNAT
+       --to-source [ipaddr[-ipaddr]][:port[-port]]
+       --random
+       --persistent
+   TCPMSS
+       --set-mss value
+       --clamp-mss-to-pmtu
+   TCPOPTSTRIP
+       --strip-options option[,option...]
+   TEE
+       --gateway ipaddr
+   TOS
+       --set-tos value[/mask]
+       --set-tos symbol
+       --and-tos bits
+       --or-tos bits
+       --xor-tos bits
+   TPROXY
+       --on-port port
+       --on-ip address
+       --tproxy-mark value[/mask]
+   TRACE
+   TTL
+       --ttl-set value
+       --ttl-dec value
+       --ttl-inc value
+   ULOG
+       --ulog-nlgroup nlgroup
+       --ulog-prefix prefix
+       --ulog-cprange size
+       --ulog-qthreshold size
+
