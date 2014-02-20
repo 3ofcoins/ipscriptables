@@ -17,7 +17,15 @@ module IPScriptables
     def initialize(opts={}, &block)
       @tables = Hashie::Mash.new
       @opts = Hashie::Mash[opts]
-      Docile.dsl_eval(self, &block) if block_given?
+      dsl_eval(&block) if block_given?
+    end
+
+    def dsl_eval(&block)
+      Docile.dsl_eval(self, &block)
+    end
+
+    def load_file(path)
+      dsl_eval { instance_eval(File.read(path), path) }
     end
 
     def respond_to?(meth)

@@ -2,4 +2,4 @@
 require 'rubygems'
 require 'ipscriptables/cli'
 
-IPScriptables::CLI.run
+exit IPScriptables::CLI.run

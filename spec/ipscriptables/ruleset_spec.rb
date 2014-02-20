@@ -154,4 +154,44 @@ COMMIT
       expect { child.render == expected_rules }
     end
   end
+
+  describe "Ruleset#diff" do
+    it "returns a Diffy::Diff from the original ruleset" do
+      child = Ruleset.from_file(fixture("only-docker.txt")).bud
+
+      expect { child.diff.to_s.each_line.grep(/^\S/).length == 7 }
+
+      child.dsl_eval do
+        inherit :filter, :FORWARD
+      end
+
+      expect { child.diff.to_s.each_line.grep(/^\S/).length == 4 }
+
+      child.dsl_eval do
+        table :nat do
+          chain :PREROUTING do
+            rule '-m addrtype --dst-type LOCAL -j DOCKER'
+          end
+          chain :OUTPUT do
+            rule '! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER'
+          end
+          chain :POSTROUTING do
+            rule '-s 172.17.0.0/16 ! -d 172.17.0.0/16 -j MASQUERADE'
+            rule '-s 10.0.3.0/24 ! -d 10.0.3.0/24 -j MASQUERADE'
+          end
+        end
+      end
+
+      expect { child.diff.to_s.empty? }
+    end
+  end
+
+  describe "Ruleset#load_file" do
+    it "Loads a ruleset from file" do
+      child = Ruleset.from_file(fixture("only-docker.txt")).bud
+      deny { child.diff.to_s.empty? }
+      child.load_file fixture('only_docker.rb')
+      expect { child.diff.to_s.empty? }
+    end
+  end
 end
