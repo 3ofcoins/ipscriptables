@@ -15,6 +15,8 @@ require 'minitest/spec'
 require 'minitest/pride' if $stderr.tty?
 require 'mocha/setup'
 require 'wrong'
+require 'fauxhai'
+require 'ohai'
 
 Wrong.config.alias_assert :expect, override: true
 include Wrong
@@ -22,6 +24,13 @@ include Wrong
 class Minitest::Spec
   include ::Wrong::Assert
   include ::Wrong::Helpers
+
+  def fauxhai!(args=nil)
+    args ||= { platform: 'ubuntu', version: '12.04' }
+    fauxhai = Hashie::Mash[Fauxhai.mock(args).data]
+    fauxhai.expects(:require_plugin).at_least(0)
+    Ohai::System.expects(:new).at_most_once.returns(fauxhai)
+  end
 
   def slow_case
     skip if !ENV['CI'] && ENV['FASTER']

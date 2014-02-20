@@ -2,44 +2,53 @@ require 'spec_helper'
 
 module IPScriptables
   describe "Helpers.run_command" do
+    def mock_status(success=true)
+      rv = mock('Process::Status')
+      rv.expects(:success?).at_least(0).returns(success)
+      rv
+    end
+
     it "runs external command and returns its stdout" do
-      slow_case
+      Helpers.expects('systemu').with(['echo', 'foo']).
+        returns([mock_status, "foo\n", ""])
       expect { Helpers.run_command('echo', 'foo') == "foo\n" }
     end
 
     it "raises RuntimError on failure status" do
-      slow_case
+      Helpers.expects('systemu').with(['false']).
+        returns([mock_status(false), "", ""])
       expect { rescuing { Helpers.run_command('false') }.is_a?(RuntimeError) }
     end
 
     it "prints command's stderr on stderr" do
-      slow_case
-      out, err = capture_io { @res = Helpers.run_command('sh', '-c', 'echo foo >&2 ; echo bar') }
+      Helpers.expects('systemu').with(['cmd']).
+        returns([mock_status, "bar\n", "foo\n"])
+      out, err = capture_io { @res = Helpers.run_command('cmd') }
       expect { out == "" }
-      expect { err == "sh: foo\n" }
+      expect { err == "cmd: foo\n" }
       expect { @res == "bar\n" }
     end
 
     it "prints stdout on stderr in case of failure" do
-      slow_case
+      Helpers.expects('systemu').with(['cmd']).
+        returns([mock_status(false), "foo\n", ""])
       out, err = capture_io do
-        @rescued = rescuing { Helpers.run_command('sh', '-c', 'echo foo ; exit 1') }
+        @rescued = rescuing { Helpers.run_command('cmd') }
       end
       expect { out == "" }
-      expect { err == "sh: foo\n" }
+      expect { err == "cmd: foo\n" }
       expect { @rescued.is_a?(RuntimeError) }
     end
   end
 
   describe "Helpers.ohai" do
+    before { fauxhai! }
+
     it "returns a configured instance of Ohai" do
-      slow_case
-      require 'socket'
-      expect { Helpers.ohai['hostname'] == Socket.gethostname }
+      expect { Helpers.ohai['hostname'] == 'Fauxhai' }
     end
 
     it "caches the ohai instance for better performance" do
-      slow_case
       expect { Helpers.ohai.object_id == Helpers.ohai.object_id }
     end
   end
