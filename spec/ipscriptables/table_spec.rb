@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 module IPScriptables
@@ -8,21 +9,22 @@ module IPScriptables
       rs
     end
 
-    it "creates built-in chains by default" do
+    it 'creates built-in chains by default' do
       {
         filter:   [:INPUT, :FORWARD, :OUTPUT],
         nat:      [:PREROUTING, :INPUT, :OUTPUT, :POSTROUTING],
         mangle:   [:PREROUTING, :INPUT, :OUTPUT, :FORWARD, :POSTROUTING],
         raw:      [:PREROUTING, :OUTPUT],
-        security: [:INPUT, :FORWARD, :OUTPUT],
+        security: [:INPUT, :FORWARD, :OUTPUT]
       }.each do |table_name, expected_chains|
-        expect { Set[*Table.new(table_name, ruleset).map(&:name)] == Set[*expected_chains] }
+        created_chains = Table.new(table_name, ruleset).map(&:name)
+        expect { Set[*created_chains] == Set[*expected_chains] }
       end
     end
 
-    it "warns about unrecognized table" do
+    it 'warns about unrecognized table' do
       out, err = capture_io { @table = Table.new(:whatever, ruleset) }
-      expect { out == "" }      # sanity
+      expect { out == '' }      # sanity
       expect { err =~ /Unrecognized table whatever/ }
       expect { @table.empty? }
     end

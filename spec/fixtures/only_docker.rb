@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 table :filter do
   chain :FORWARD do
     rule '-o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT'

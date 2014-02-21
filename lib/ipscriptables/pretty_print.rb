@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 module IPScriptables
   class Ruleset
     def inspect
@@ -8,7 +10,7 @@ module IPScriptables
       q.object_address_group(self) do
         q.group(2) do
           q.breakable
-          q.seplist(self, ->{ q.breakable } ) {|v| q.pp v }
+          q.seplist(self, -> { q.breakable }) { |v| q.pp v }
         end
       end
     end
@@ -20,10 +22,10 @@ module IPScriptables
     end
 
     def pretty_print(q)
-      q.group(2, "*#{name} {", "}") do
+      q.group(2, "*#{name} {", '}') do
         unless @chains.empty?
           q.breakable
-          q.seplist(self, ->{ q.breakable }) {|v| q.pp v }
+          q.seplist(self, -> { q.breakable }) { |v| q.pp v }
         end
       end
     end
@@ -35,10 +37,10 @@ module IPScriptables
     end
 
     def pretty_print(q)
-      q.group(2, "#{render_header} {", "}") do
+      q.group(2, "#{render_header} {", '}') do
         unless rules.empty?
           q.breakable
-          q.seplist(rules, ->{ q.breakable " ; " } ) { |v| q.pp(v) }
+          q.seplist(rules, -> { q.breakable ' ; ' }) { |v| q.pp(v) }
         end
       end
     end

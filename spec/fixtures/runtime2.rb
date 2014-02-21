@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 iptables do
   table :nat do
     chain :PREROUTING do

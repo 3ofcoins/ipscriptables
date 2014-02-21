@@ -1,31 +1,33 @@
+# -*- coding: utf-8 -*-
+# rubocop:disable LineLength
 require 'spec_helper'
 
 require 'stringio'
 
 module IPScriptables
   describe Runtime do
-    let(:fixture_text) { File.read(fixture("only-docker-c.txt")) }
-    let(:fixture6_text) { File.read(fixture("ip6tables-empty.txt")) }
+    let(:fixture_text) { File.read(fixture('only-docker-c.txt')) }
+    let(:fixture6_text) { File.read(fixture('ip6tables-empty.txt')) }
     let(:runtime) { Runtime.new }
 
     before do
       IO.expects(:popen).never  # just to be safe
-      Helpers.expects(:run_command).with('ip6tables-save', '-c').
-        at_most_once.
-        returns(fixture6_text)
-      Helpers.expects(:run_command).with('iptables-save', '-c').
-        at_most_once.
-        returns(fixture_text)
+      Helpers.expects(:run_command).with('ip6tables-save', '-c')
+        .at_most_once
+        .returns(fixture6_text)
+      Helpers.expects(:run_command).with('iptables-save', '-c')
+        .at_most_once
+        .returns(fixture_text)
     end
 
-    it "does not run undefined rulesets" do
+    it 'does not run undefined rulesets' do
       out, err = capture_io { runtime.execute! }
-      expect { out == "" }
+      expect { out == '' }
       expect { err =~ /No iptables ruleset defined, moving along/ }
       expect { err =~ /No ip6tables ruleset defined, moving along/ }
     end
 
-    it "can load rulesets from file" do
+    it 'can load rulesets from file' do
       out, err = capture_io do
         runtime.load_file(fixture('runtime.rb'))
         runtime.execute!
@@ -38,7 +40,7 @@ module IPScriptables
       expect { err =~ /Would run iptables-restore/ }
     end
 
-    it "can load multiple files & won't run if rules are unchanged" do
+    it 'can load multiple files & won\'t run if rules are unchanged' do
       out, err = capture_io do
         runtime.load_file(fixture('runtime.rb'))
         runtime.load_file(fixture('runtime2.rb'))
@@ -52,7 +54,7 @@ module IPScriptables
       expect { err =~ /No changes for iptables, moving along./ }
     end
 
-    it "accepts blocks as well as files" do
+    it 'accepts blocks as well as files' do
       out, err = capture_io do
         runtime.load_file(fixture('runtime.rb'))
         runtime.dsl_eval do
@@ -80,7 +82,7 @@ module IPScriptables
       expect { err =~ /No changes for iptables, moving along./ }
     end
 
-    it "configures ipv6" do
+    it 'configures ipv6' do
       out, err = capture_io do
         runtime.dsl_eval do
           ip6tables do
@@ -99,14 +101,16 @@ module IPScriptables
       expect { err =~ /Would run ip6tables-restore./ }
     end
 
-    it "doesn't allow triggering execution from within DSL" do
-      expect { rescuing { runtime.dsl_eval { execute! } }.to_s =~
-        /I can't let you do that/ }
+    it 'doesn\'t allow triggering execution from within DSL' do
+      expect do
+        rescuing { runtime.dsl_eval { execute! } }.to_s =~
+          /I can't let you do that/
+      end
     end
 
-    describe "options" do
+    describe 'options' do
       before do
-        $?.expects(:success?).at_least(0).returns(true)
+        $CHILD_STATUS.expects(:success?).at_least(0).returns(true)
 
         @out, @err = capture_io do
           runtime.load_file(fixture('runtime.rb'))
@@ -123,22 +127,22 @@ module IPScriptables
         end
       end
 
-      it "behaves normally without options" do
-        out, err = capture_io { runtime.execute! }
+      it 'behaves normally without options' do
+        out, _err = capture_io { runtime.execute! }
         expect { out.lines.grep(/^\S/).length == 9 }
         expect { @err =~ /Would run iptables-restore./ }
         expect { @err =~ /Would run ip6tables-restore./ }
       end
 
-      it "can be instructed to skip a ruleset" do
+      it 'can be instructed to skip a ruleset' do
         runtime.opts[:ip6tables] = false
-        out, err = capture_io { runtime.execute! }
+        out, _err = capture_io { runtime.execute! }
         expect { out.lines.grep(/^\S/).length == 4 }
         expect { @err =~ /Would run iptables-restore./ }
         expect { @err =~ /Skipping ip6tables as requested/ }
       end
 
-      it "applies rules only when specifically told" do
+      it 'applies rules only when specifically told' do
         runtime.opts[:apply] = true
 
         iptables_restore_io = mock('IO')
@@ -170,30 +174,30 @@ EOF
 COMMIT
 EOF
 
-        IO.expects(:popen).with(['iptables-restore',  '-c'], 'w').once.yields(iptables_restore_io)
-        IO.expects(:popen).with(['ip6tables-restore', '-c'], 'w').once.yields(ip6tables_restore_io)
+        IO.expects(:popen).with(%w[iptables-restore -c], 'w').once.yields(iptables_restore_io)
+        IO.expects(:popen).with(%w[ip6tables-restore -c], 'w').once.yields(ip6tables_restore_io)
 
-        out, err = capture_io { @rv = runtime.execute! }
+        capture_io { @rv = runtime.execute! }
         expect { @err =~ /Running iptables-restore -c/ }
         expect { @err =~ /Running ip6tables-restore -c/ }
         deny   { @err =~ /There were errors/ }
         expect { @rv == true }
       end
 
-      it "logs error and proceeds, but returns false, when restore command fails" do
+      it 'logs error and proceeds, but returns false, when restore command fails' do
         runtime.opts[:apply] = true
 
         iptables_restore_io = mock('IO')
         iptables_restore_io.expects(:write).once
         ip6tables_restore_io = mock('IO')
         ip6tables_restore_io.expects(:write).once
-        $?.expects(:success?)
+        $CHILD_STATUS.expects(:success?)
           .once.returns(false).then.returns(true)
 
-        IO.expects(:popen).with(['iptables-restore',  '-c'], 'w').once.yields(iptables_restore_io)
-        IO.expects(:popen).with(['ip6tables-restore', '-c'], 'w').once.yields(ip6tables_restore_io)
+        IO.expects(:popen).with(%w[iptables-restore -c], 'w').once.yields(iptables_restore_io)
+        IO.expects(:popen).with(%w[ip6tables-restore -c], 'w').once.yields(ip6tables_restore_io)
 
-        out, err = capture_io { @rv = runtime.execute! }
+        out, _err = capture_io { @rv = runtime.execute! }
         expect { out.lines.grep(/^\S/).length == 9 }
         expect { @err =~ /Running iptables-restore -c/ }
         expect { @err =~ /Running ip6tables-restore -c/ }
@@ -202,11 +206,11 @@ EOF
         expect { @rv == false }
       end
 
-      it "does not output diff when quiet flag is specified" do
+      it 'does not output diff when quiet flag is specified' do
         runtime.opts[:quiet] = true
 
-        out, err = capture_io { @rv = runtime.execute! }
-        expect { out == "" }
+        out, _err = capture_io { @rv = runtime.execute! }
+        expect { out == '' }
         expect { @err =~ /Would run iptables-restore -c/ }
         expect { @err =~ /Would run ip6tables-restore -c/ }
       end

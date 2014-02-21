@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+require 'English'
 require 'logger'
 
 module IPScriptables
@@ -5,7 +8,7 @@ module IPScriptables
     DEFAULT_OPTS = { counters: true }
     attr_reader :log, :opts
 
-    def initialize(opts={}, logger=nil)
+    def initialize(opts = {}, logger = nil)
       @opts = DEFAULT_OPTS.merge(opts)
       @log = logger || Logger.new($stderr)
       @evaluating = 0
@@ -13,16 +16,16 @@ module IPScriptables
 
     def iptables(&block)
       @evaluating += 1
-      ( @iptables ||= IPScriptables::Ruleset.from_iptables.bud(opts) ).
-        dsl_eval(&block)
+      (@iptables ||= IPScriptables::Ruleset.from_iptables.bud(opts))
+        .dsl_eval(&block)
     ensure
       @evaluating -= 1
     end
 
     def ip6tables(&block)
       @evaluating += 1
-      ( @ip6tables ||= IPScriptables::Ruleset.from_ip6tables.bud(opts) ).
-        dsl_eval(&block)
+      (@ip6tables ||= IPScriptables::Ruleset.from_ip6tables.bud(opts))
+        .dsl_eval(&block)
     ensure
       @evaluating -= 1
     end
@@ -42,9 +45,9 @@ module IPScriptables
       @evaluating -= 1
     end
 
-    def execute!
+    def execute!  # rubocop:disable CyclomaticComplexity, MethodLength
       if @evaluating != 0
-        raise RuntimeError, "I can't let you do that (DSL eval depth #{@evaluating})"
+        fail "I can't let you do that (DSL eval depth #{@evaluating})"
       end
 
       ok = true
@@ -52,7 +55,7 @@ module IPScriptables
       { iptables: @iptables, ip6tables: @ip6tables }.each do |name, ruleset|
         if ruleset.nil?
           log.debug "No #{name} ruleset defined, moving along"
-        elsif ! opts.fetch(name, true)
+        elsif !opts.fetch(name, true)
           log.info "Skipping #{name} as requested"
         else
           diff = ruleset.diff
@@ -64,13 +67,13 @@ module IPScriptables
             puts diff.to_s(format) unless opts[:quiet]
             if opts[:apply]
               log.info "Running #{name}-restore -c"
-              IO.popen(["#{name}-restore", "-c"], 'w') do |restore|
+              IO.popen(["#{name}-restore", '-c'], 'w') do |restore|
                 restore.write(ruleset.render)
               end
-              if $?.success?
+              if $CHILD_STATUS.success? # rubocop:disable BlockNesting
                 log.debug "Successfully finished #{name}-restore"
               else
-                log.error "Failure in #{name}-restore: #{$?}"
+                log.error "Failure in #{name}-restore: #{$CHILD_STATUS}"
                 ok = false
                 return ok if opts[:fail_fast]
               end
@@ -81,9 +84,9 @@ module IPScriptables
         end
       end
 
-      log.warn "There were errors" unless ok
+      log.warn 'There were errors' unless ok
 
-      return ok
+      ok
     end
   end
 end

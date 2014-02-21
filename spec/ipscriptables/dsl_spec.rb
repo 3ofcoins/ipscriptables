@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 require 'spec_helper'
 
 module IPScriptables
-  describe "Chain#rule" do
+  describe 'Chain#rule' do
     THREE_PORTS_RULES = <<EOF
 *filter
 :INPUT ACCEPT [0:0]
@@ -26,7 +27,7 @@ EOF
       expect { rs.render == THREE_PORTS_RULES }
     end
 
-    it "allows to describe rulesets" do
+    it 'allows to describe rulesets' do
       expect_three_ports_from do
         rule '-p tcp -m tcp --dport 22 -j ACCEPT'
         rule '-p tcp -m tcp --dport 80 -j ACCEPT'
@@ -34,7 +35,7 @@ EOF
       end
     end
 
-    it "Allows nesting for DRY" do
+    it 'Allows nesting for DRY' do
       expect_three_ports_from do
         rule '-p tcp -m tcp' do
           rule '--dport 22 -j ACCEPT'
@@ -44,28 +45,29 @@ EOF
       end
     end
 
-    it "accepts iterable of elements for iteration" do
+    it 'accepts iterable of elements for iteration' do
       expect_three_ports_from do
         rule [
           '-p tcp -m tcp --dport 22 -j ACCEPT',
           '-p tcp -m tcp --dport 80 -j ACCEPT',
-          '-p tcp -m tcp --dport 443 -j ACCEPT' ]
+          '-p tcp -m tcp --dport 443 -j ACCEPT'
+        ]
       end
     end
 
-    it "accepts multiple of arguments and treats them as if they were nested" do
+    it 'accepts multiple of arguments and processes them as if nested' do
       expect_three_ports_from do
         rule '-p tcp -m tcp --dport', [22, 80, 443], '-j ACCEPT'
       end
     end
 
-    it "understands parameters provided as hashes" do
+    it 'understands parameters provided as hashes' do
       expect_three_ports_from do
         rule p: :tcp, m: :tcp, dport: [22, 80, 443], j: :ACCEPT
       end
 
       expect_three_ports_from do
-        rule '-p' => :tcp, '-m' => :tcp, '--dport' => [22, 80, 443], '-j' => :ACCEPT
+        rule '-p' => :tcp, '-m' => :tcp, '--dport' => [22, 80, 443], '-j' => :ACCEPT # rubocop:disable LineLength
       end
     end
   end

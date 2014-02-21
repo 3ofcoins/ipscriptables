@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'rubygems'
 require 'bundler/setup'
 
@@ -21,11 +23,12 @@ require 'ohai'
 Wrong.config.alias_assert :expect, override: true
 include Wrong
 
+# Prepare testing environment
 class Minitest::Spec
   include ::Wrong::Assert
   include ::Wrong::Helpers
 
-  def fauxhai!(args=nil)
+  def fauxhai!(args = nil)
     args ||= { platform: 'ubuntu', version: '12.04' }
     fauxhai = Hashie::Mash[Fauxhai.mock(args).data]
     fauxhai.expects(:require_plugin).at_least(0)
@@ -37,7 +40,7 @@ class Minitest::Spec
   end
 
   def self.fixture(*path)
-    File.join(File.realpath(File.dirname(__FILE__)), "fixtures", *path)
+    File.join(File.realpath(File.dirname(__FILE__)), 'fixtures', *path)
   end
 
   def fixture(*path)
@@ -54,4 +57,4 @@ class Minitest::Spec
   end
 end
 
-require "ipscriptables"
+require 'ipscriptables'

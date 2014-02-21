@@ -1,0 +1,10 @@
+AllCops:
+  Excludes:
+    - tmp/**
+    - chef-cookbook/**
+
+Documentation:
+  Enabled: false
+
+HashSyntax:
+  Enabled: false

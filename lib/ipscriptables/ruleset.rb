@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'diffy'
 
 require 'ipscriptables/helpers'
@@ -14,7 +16,7 @@ module IPScriptables
     def_delegators :to_ary, :each
     def_delegators :opts, :original
 
-    def initialize(opts={}, &block)
+    def initialize(opts = {}, &block)
       @tables = Hashie::Mash.new
       @opts = Hashie::Mash[opts]
       dsl_eval(&block) if block_given?
@@ -40,8 +42,9 @@ module IPScriptables
       end
     end
 
-    def bud(opts={}, &block)
-      child = self.class.new(opts.merge(skip_builtin_chains: true, original: self))
+    def bud(opts = {}, &block)
+      child = self.class.new(opts.merge(
+          skip_builtin_chains: true, original: self))
       each do |table|
         child_table = child.table(table.name)
         table.each do |chain|
@@ -72,8 +75,8 @@ module IPScriptables
       map(&:render).join("\n") << "\n"
     end
 
-    def diff(from=nil)
-      Diffy::Diff.new((from||original).render, render)
+    def diff(from = nil)
+      Diffy::Diff.new((from || original).render, render)
     end
   end
 end

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'shellwords'
 
 module IPScriptables
@@ -22,12 +23,10 @@ module IPScriptables
     attr_reader :chain, :rule, :counters
     def_delegators :chain, :opts
 
-    def initialize(chain, rule, counters = nil)
-      @chain = chain
-      @rule = rule
+    def initialize(chain, rule, counters = nil) # rubocop:disable MethodLength
+      @chain, @rule, @counters = chain, rule, counters
       @parsed = Hashie::Mash.new
 
-      @counters = counters
       @counters ||= original.counters if original
       @counters ||= [0, 0] if opts[:counters]
 
@@ -36,7 +35,7 @@ module IPScriptables
         case word
         when /^-+(.*)$/
           self[_key] = true if _key
-          _key = $1.gsub('-', '_')
+          _key = Regexp.last_match[1].gsub('-', '_')
         else
           self[_key] = word
           _key = nil
@@ -54,7 +53,7 @@ module IPScriptables
     end
 
     def [](k)
-      k = k.to_s.sub(/^-+/,'').gsub('-', '_')
+      k = k.to_s.sub(/^-+/, '').gsub('-', '_')
       @parsed[OPTION_SYNONYMS.fetch(k, k)]
     end
 
@@ -70,8 +69,8 @@ module IPScriptables
       self[:jump]
     end
 
-    def =~(rx)
-      self.rule =~ rx
+    def =~(other)
+      rule =~ other
     end
 
     def render
@@ -83,6 +82,7 @@ module IPScriptables
     end
 
     private
+
     def []=(k, v)
       k = OPTION_SYNONYMS.fetch(k, k)
       if @parsed.key?(k)
@@ -93,4 +93,3 @@ module IPScriptables
     end
   end
 end
-

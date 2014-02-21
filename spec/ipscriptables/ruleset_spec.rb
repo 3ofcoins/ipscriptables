@@ -1,24 +1,26 @@
+# -*- coding: utf-8 -*-
+# rubocop:disable LineLength
 require 'spec_helper'
 
 module IPScriptables
-  describe "Ruleset#method_missing" do
+  describe 'Ruleset#method_missing' do
     let(:rs) { Ruleset.new(foo: 23) }
-    it "forwards calls to ruleset's options" do
+    it 'forwards calls to ruleset\'s options' do
       expect { rs.foo == 23 }
       expect { rs.respond_to? :foo }
     end
 
-    it "rejects methods that are not in options" do
+    it 'rejects methods that are not in options' do
       expect { rescuing { rs.bar }.is_a?(NoMethodError) }
       deny   { rs.respond_to? :bar }
     end
   end
 
-  describe "Ruleset#bud" do
-    let(:drumknott) { Ruleset.from_file(fixture("drumknott.txt")) }
-    let(:ghq)       { Ruleset.from_file(fixture("ghq.txt")) }
+  describe 'Ruleset#bud' do
+    let(:drumknott) { Ruleset.from_file(fixture('drumknott.txt')) }
+    let(:ghq)       { Ruleset.from_file(fixture('ghq.txt')) }
 
-    it "creates a child ruleset with identical tables and chains, but no rules" do
+    it 'creates a child ruleset with identical tables and chains, but no rules' do
       expected_rules = <<-EOF
 *mangle
 :PREROUTING ACCEPT [9070264:2761485141]
@@ -46,7 +48,7 @@ COMMIT
       expect { child.original == drumknott }
     end
 
-    it "allows chain inheritance" do
+    it 'allows chain inheritance' do
       child = drumknott.bud do
         inherit :nat, :DOCKER
       end
@@ -76,7 +78,7 @@ COMMIT
       expect { child.render == expected_rules }
     end
 
-    it "allows filtering inherited chains" do
+    it 'allows filtering inherited chains' do
       child = drumknott.bud do
         inherit(:filter, :FWR) { |rule| !rule[:source] }
       end
@@ -113,7 +115,7 @@ COMMIT
       expect { drumknott.render =~ /^-A FWR -s 1\.1\.1\.1/ }
     end
 
-    it "copies original's chain with counters" do
+    it 'copies original\'s chain with counters' do
       child = ghq.bud do
         inherit(:nat, :DOCKER)
         table :filter do
@@ -155,9 +157,9 @@ COMMIT
     end
   end
 
-  describe "Ruleset#diff" do
-    it "returns a Diffy::Diff from the original ruleset" do
-      child = Ruleset.from_file(fixture("only-docker.txt")).bud
+  describe 'Ruleset#diff' do
+    it 'returns a Diffy::Diff from the original ruleset' do
+      child = Ruleset.from_file(fixture('only-docker.txt')).bud
 
       expect { child.diff.to_s.each_line.grep(/^\S/).length == 7 }
 
@@ -186,9 +188,9 @@ COMMIT
     end
   end
 
-  describe "Ruleset#load_file" do
-    it "Loads a ruleset from file" do
-      child = Ruleset.from_file(fixture("only-docker.txt")).bud
+  describe 'Ruleset#load_file' do
+    it 'Loads a ruleset from file' do
+      child = Ruleset.from_file(fixture('only-docker.txt')).bud
       deny { child.diff.to_s.empty? }
       child.load_file fixture('only_docker.rb')
       expect { child.diff.to_s.empty? }

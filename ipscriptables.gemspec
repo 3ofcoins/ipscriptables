@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.1"
   spec.add_development_dependency "wrong", "~> 0.7"
   spec.add_development_dependency "fauxhai"
+  spec.add_development_dependency "rubocop"
 end

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 module IPScriptables
   class Table
     extend Forwardable
@@ -21,38 +23,26 @@ module IPScriptables
       ruleset.original[name] if ruleset.original
     end
 
+    BUILTIN_CHAINS = {
+      filter:   [:INPUT, :FORWARD, :OUTPUT],
+      nat:      [:PREROUTING, :INPUT, :OUTPUT, :POSTROUTING],
+      mangle:   [:PREROUTING, :INPUT, :OUTPUT, :FORWARD, :POSTROUTING],
+      raw:      [:PREROUTING, :OUTPUT],
+      security: [:INPUT, :OUTPUT, :FORWARD]
+    }
+
     def create_builtin_chains
-      # initalize builtin chains
-      case @name
-      when :filter
-        chain :INPUT,       :ACCEPT
-        chain :FORWARD,     :ACCEPT
-        chain :OUTPUT,      :ACCEPT
-      when :nat
-        chain :PREROUTING,  :ACCEPT
-        chain :INPUT,       :ACCEPT
-        chain :OUTPUT,      :ACCEPT
-        chain :POSTROUTING, :ACCEPT
-      when :mangle
-        chain :PREROUTING,  :ACCEPT
-        chain :INPUT,       :ACCEPT
-        chain :OUTPUT,      :ACCEPT
-        chain :FORWARD,     :ACCEPT
-        chain :POSTROUTING, :ACCEPT
-      when :raw
-        chain :PREROUTING,  :ACCEPT
-        chain :OUTPUT,      :ACCEPT
-      when :security
-        chain :INPUT,       :ACCEPT
-        chain :OUTPUT,      :ACCEPT
-        chain :FORWARD,     :ACCEPT
+      if BUILTIN_CHAINS.key? @name
+        BUILTIN_CHAINS[@name].each do |builtin|
+          chain builtin, :ACCEPT
+        end
       else
         warn "Unrecognized table #{@name}, not creating builtin chains"
       end
     end
 
-    def inherit(*names, &block)
-      raise ValueError, "Need original to inherit" unless ruleset.original
+    def inherit(*names, &block) # rubocop:disable MethodLength
+      fail ValueError, 'Need original to inherit' unless ruleset.original
       original_table = ruleset.original[name]
       names = original_table.keys if names.empty?
       names.each do |name|
@@ -78,11 +68,10 @@ module IPScriptables
     end
 
     def render
-      [ "*#{name}",
-        map(&:render_header).join("\n"),
-        map(&:render_rules).compact.join("\n"),
-        "COMMIT",
-      ].reject { |piece| piece == "" }.join("\n")
+      ["*#{name}",
+       map(&:render_header).join("\n"),
+       map(&:render_rules).compact.join("\n"),
+       'COMMIT'].reject { |piece| piece == '' }.join("\n")
     end
   end
 end

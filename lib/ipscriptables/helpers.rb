@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 require 'ohai'
 require 'systemu'
 
@@ -11,7 +13,7 @@ module IPScriptables
         status, stdout, stderr = systemu(argv)
         unless status.success?
           $stderr.puts stdout.gsub(/^/, "#{argv.first}: ") unless stdout.empty?
-          raise RuntimeError, stderr
+          fail "#{status}: #{stderr}"
         end
         $stderr.puts stderr.gsub(/^/, "#{argv.first}: ") unless stderr.empty?
         stdout
@@ -26,7 +28,8 @@ module IPScriptables
       def setup_ohai
         require 'ohai'
         ohai = Ohai::System.new
-        %w[os platform kernel hostname network ip_scopes network_listeners cloud].each do |plugin|
+        %w[os platform kernel hostname network ip_scopes network_listeners
+           cloud].each do |plugin|
           ohai.require_plugin plugin
         end
         ohai

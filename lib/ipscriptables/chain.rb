@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 module IPScriptables
   class Chain
     extend Forwardable
@@ -7,7 +9,7 @@ module IPScriptables
     def_delegators :rules, :each, :clear, :<<, :empty?
     def_delegators :table, :ruleset, :opts
 
-    def initialize(name, table, policy='-', counters=[0,0], &block)
+    def initialize(name, table, policy = '-', counters = [0, 0], &block)
       @name = name
       @table = table
       @policy = policy
@@ -21,13 +23,14 @@ module IPScriptables
       table.original[name] if table.original
     end
 
-    def alter(policy=nil, counters=nil, &block)
+    def alter(policy = nil, counters = nil, &block)
       @policy = policy unless policy.nil?
       @counters = counters unless counters.nil?
       Docile.dsl_eval(self, &block) if block_given?
     end
 
-    def rule(term, *rest, &block)
+    def rule(term, *rest, &block) # rubocop:disable CyclomaticComplexity, MethodLength, LineLength
+                                  # FIXME: ^^
       case term
       when Rule
         @rules << term         # we trust here that term.chain is self
