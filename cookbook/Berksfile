@@ -1,0 +1,6 @@
+source "https://api.berkshelf.com"
+
+metadata
+
+cookbook 'ipscriptables-test',
+         path: 'test/cookbooks/ipscriptables-test'

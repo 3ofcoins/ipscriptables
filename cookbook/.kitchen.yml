@@ -1,0 +1,28 @@
+---
+driver:
+  name: vagrant
+  pre_create_command: |
+    set -e -x
+    dir=`pwd`/test/data
+    rm -fv $dir/*.gem
+    cd ..
+    gem build ipscriptables.gemspec
+    mv -v ipscriptables-*.gem $dir
+
+provisioner:
+  name: chef_solo
+  data_path: test/data
+
+platforms:
+  - name: ubuntu-12.04
+    driver_config:
+      box: opscode_ubuntu-12.04_provisionerless
+      box_url: https://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-12.04_chef-provisionerless.box
+
+suites:
+  - name: default
+    run_list:
+      - recipe[ipscriptables-test]
+    attributes:
+      ipscriptables:
+        version: null
