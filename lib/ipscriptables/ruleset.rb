@@ -43,8 +43,9 @@ module IPScriptables
     end
 
     def bud(opts = {}, &block)
-      child = self.class.new(opts.merge(
-          skip_builtin_chains: true, original: self))
+      opts = opts.merge skip_builtin_chains: true, original: self
+      opts[:family] = self.opts.family if self.opts.family?
+      child = self.class.new(opts)
       each do |table|
         child_table = child.table(table.name)
         table.each do |chain|
@@ -76,7 +77,27 @@ module IPScriptables
     end
 
     def diff(from = nil)
-      Diffy::Diff.new((from || original).render, render)
+      from ||= original
+      fail 'Need something to diff against' unless from
+      Diffy::Diff.new(from.render, render)
+    end
+
+    def restore!
+      IO.popen(restore_command, 'w') do |restore|
+        restore.write(render)
+      end
+      unless $?.success?
+        fail "Failure in #{restore_command.join(' ').inspect}: #{$?}"
+      end
+    end
+
+    def restore_command
+      case opts[:family]
+      when :inet  then %w(iptables-restore  -c)
+      when :inet6 then %w(ip6tables-restore -c)
+      else fail NotImplementedError,
+                "Unsupported family #{opts[:family].inspect}"
+      end
     end
   end
 end

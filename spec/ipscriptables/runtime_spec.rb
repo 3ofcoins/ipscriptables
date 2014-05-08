@@ -12,10 +12,10 @@ module IPScriptables
 
     before do
       IO.expects(:popen).never  # just to be safe
-      Helpers.expects(:run_command).with('ip6tables-save', '-c')
+      Helpers.expects(:run_command).with('ip6tables-save', '-c').never
         .at_most_once
         .returns(fixture6_text)
-      Helpers.expects(:run_command).with('iptables-save', '-c')
+      Helpers.expects(:run_command).with('iptables-save', '-c').never
         .at_most_once
         .returns(fixture_text)
     end
@@ -23,8 +23,8 @@ module IPScriptables
     it 'does not run undefined rulesets' do
       out, err = capture_io { runtime.execute! }
       expect { out == '' }
-      expect { err =~ /No iptables ruleset defined, moving along/ }
-      expect { err =~ /No ip6tables ruleset defined, moving along/ }
+      deny   { err =~ /Would restore inet/ }
+      deny   { err =~ /Would restore inet6/ }
     end
 
     it 'can load rulesets from file' do
@@ -33,11 +33,11 @@ module IPScriptables
         runtime.execute!
       end
 
-      expect { err =~ /No ip6tables ruleset defined, moving along/ }
       expect { err =~ /Loading configuration from #{fixture('runtime.rb')}/ }
       deny   { err =~ /Loading configuration from #{fixture('runtime2.rb')}/ }
       expect { out.lines.grep(/^\S/).length == 4 }
-      expect { err =~ /Would run iptables-restore/ }
+      expect { err =~ /Would restore inet/ }
+      deny   { err =~ /Would restore inet6/ }
     end
 
     it 'can load multiple files & won\'t run if rules are unchanged' do
@@ -47,11 +47,10 @@ module IPScriptables
         runtime.execute!
       end
 
-      expect { err =~ /No ip6tables ruleset defined, moving along/ }
       expect { err =~ /Loading configuration from #{fixture('runtime.rb')}/ }
       expect { err =~ /Loading configuration from #{fixture('runtime2.rb')}/ }
       expect { out.lines.grep(/^\S/).empty? }
-      expect { err =~ /No changes for iptables, moving along./ }
+      expect { err =~ /No changes for inet, moving along./ }
     end
 
     it 'accepts blocks as well as files' do
@@ -76,10 +75,9 @@ module IPScriptables
         runtime.execute!
       end
 
-      expect { err =~ /No ip6tables ruleset defined, moving along/ }
       expect { err =~ /Loading configuration from #{fixture('runtime.rb')}/ }
       expect { out.lines.grep(/^\S/).empty? }
-      expect { err =~ /No changes for iptables, moving along./ }
+      expect { err =~ /No changes for inet, moving along./ }
     end
 
     it 'configures ipv6' do
@@ -96,9 +94,8 @@ module IPScriptables
         runtime.execute!
       end
 
-      expect { err =~ /No iptables ruleset defined, moving along/ }
       expect { out =~ /^\+\[0:0\] -A INPUT -m tcp -p tcp --dport 22 -j ACCEPT$/ }
-      expect { err =~ /Would run ip6tables-restore./ }
+      expect { err =~ /Would restore inet6/ }
     end
 
     it 'doesn\'t allow triggering execution from within DSL' do
@@ -130,16 +127,16 @@ module IPScriptables
       it 'behaves normally without options' do
         out, _err = capture_io { runtime.execute! }
         expect { out.lines.grep(/^\S/).length == 9 }
-        expect { @err =~ /Would run iptables-restore./ }
-        expect { @err =~ /Would run ip6tables-restore./ }
+        expect { @err =~ /Would restore inet/ }
+        expect { @err =~ /Would restore inet6/ }
       end
 
       it 'can be instructed to skip a ruleset' do
-        runtime.opts[:ip6tables] = false
+        runtime.opts[:inet6] = false
         out, _err = capture_io { runtime.execute! }
         expect { out.lines.grep(/^\S/).length == 4 }
-        expect { @err =~ /Would run iptables-restore./ }
-        expect { @err =~ /Skipping ip6tables as requested/ }
+        expect { @err =~ /Would restore inet/ }
+        expect { @err =~ /Skipping inet6 as requested/ }
       end
 
       it 'applies rules only when specifically told' do
@@ -177,9 +174,20 @@ EOF
         IO.expects(:popen).with(%w(iptables-restore -c), 'w').once.yields(iptables_restore_io)
         IO.expects(:popen).with(%w(ip6tables-restore -c), 'w').once.yields(ip6tables_restore_io)
 
-        capture_io { @rv = runtime.execute! }
-        expect { @err =~ /Running iptables-restore -c/ }
-        expect { @err =~ /Running ip6tables-restore -c/ }
+        begin
+          capture_io { @rv = runtime.execute! }
+        rescue Exception => e
+          STDERR.puts <<EOF
+ERR
+#{@err}
+
+OUT
+#{@out}
+EOF
+          raise e
+        end
+        expect { @err =~ /Restoring inet/ }
+        expect { @err =~ /Restoring inet6/ }
         deny   { @err =~ /There were errors/ }
         expect { @rv == true }
       end
@@ -199,9 +207,9 @@ EOF
 
         out, _err = capture_io { @rv = runtime.execute! }
         expect { out.lines.grep(/^\S/).length == 9 }
-        expect { @err =~ /Running iptables-restore -c/ }
-        expect { @err =~ /Running ip6tables-restore -c/ }
-        expect { @err =~ /ERROR.* Failure in iptables-restore/ }
+        expect { @err =~ /Restoring inet/ }
+        expect { @err =~ /Restoring inet6/ }
+        expect { @err =~ /ERROR.* Failure restoring inet:/ }
         expect { @err =~ /There were errors/ }
         expect { @rv == false }
       end
@@ -211,8 +219,8 @@ EOF
 
         out, _err = capture_io { @rv = runtime.execute! }
         expect { out == '' }
-        expect { @err =~ /Would run iptables-restore -c/ }
-        expect { @err =~ /Would run ip6tables-restore -c/ }
+        expect { @err =~ /Would restore inet/ }
+        expect { @err =~ /Would restore inet6/ }
       end
     end
   end

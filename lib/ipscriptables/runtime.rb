@@ -13,22 +13,32 @@ module IPScriptables
       @opts = DEFAULT_OPTS.merge(opts)
       @log = logger || Logger.new($stderr)
       @evaluating = 0
+      @rulesets = {}
+    end
+
+    def ruleset(family)
+      family = family.to_sym
+      @rulesets[family] ||=
+        IPScriptables::Ruleset.from_system(family: family).bud(opts)
+    end
+
+    def family(*families, &block)
+      families.each do |family|
+        begin
+          @evaluating += 1
+          ruleset(family).dsl_eval(&block)
+        ensure
+          @evaluating -= 1
+        end
+      end
     end
 
     def iptables(&block)
-      @evaluating += 1
-      (@iptables ||= IPScriptables::Ruleset.from_iptables.bud(opts))
-        .dsl_eval(&block)
-    ensure
-      @evaluating -= 1
+      family(:inet, &block)
     end
 
     def ip6tables(&block)
-      @evaluating += 1
-      (@ip6tables ||= IPScriptables::Ruleset.from_ip6tables.bud(opts))
-        .dsl_eval(&block)
-    ensure
-      @evaluating -= 1
+      family(:inet6, &block)
     end
 
     def load_file(path)
@@ -52,34 +62,28 @@ module IPScriptables
       end
 
       ok = true
-
-      { iptables: @iptables, ip6tables: @ip6tables }.each do |name, ruleset|
-        if ruleset.nil?
-          log.debug "No #{name} ruleset defined, moving along"
-        elsif !opts.fetch(name, true)
-          log.info "Skipping #{name} as requested"
+      @rulesets.sort.each do |family, ruleset|
+        if !opts.fetch(family, true)
+          log.info "Skipping #{family} as requested"
         else
           diff = ruleset.diff
           if diff.to_s.empty?
-            log.info "No changes for #{name}, moving along."
+            log.info "No changes for #{family}, moving along."
           else
-            log.info "Changes found for #{name}"
+            log.info "Changes found for #{family}"
             format = opts.fetch(:color, $stdout.tty?) ? :color : :text
             puts diff.to_s(format) unless opts[:quiet]
             if opts[:apply]
-              log.info "Running #{name}-restore -c"
-              IO.popen(["#{name}-restore", '-c'], 'w') do |restore|
-                restore.write(ruleset.render)
-              end
-              if $CHILD_STATUS.success? # rubocop:disable BlockNesting
-                log.debug "Successfully finished #{name}-restore"
-              else
-                log.error "Failure in #{name}-restore: #{$CHILD_STATUS}"
+              log.info "Restoring #{family}"
+              begin
+                ruleset.restore!
+              rescue => e
+                log.error "Failure restoring #{family}: #{e}"
                 ok = false
                 return ok if opts[:fail_fast]
               end
             else
-              log.info "Would run #{name}-restore -c"
+              log.info "Would restore #{family}"
             end
           end
         end

@@ -23,7 +23,7 @@ TODO: write real instructions.
 Write a script a bit like this (ip6tables work too):
 
 ```ruby
-iptables do
+family :inet do
   table :nat do
     inherit(:DOCKER)
     inherit(:PREROUTING, :OUTPUT) { |rule| rule.target == 'DOCKER' }

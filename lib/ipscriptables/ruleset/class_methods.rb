@@ -46,12 +46,21 @@ module IPScriptables
         from_s(Helpers.run_command(*args), opts.merge(command: args))
       end
 
+      def from_system(opts = {})
+        opts[:family] ||= :inet
+        case opts[:family]
+        when :inet  then from_command 'iptables-save',  '-c', opts
+        when :inet6 then from_command 'ip6tables-save', '-c', opts
+        else fail NotImplementedError, "Unknonwn family #{opts[:family]}"
+        end
+      end
+
       def from_iptables(opts = {})
-        from_command('iptables-save', '-c', opts.merge(family: :inet))
+        from_system(opts.merge(family: :inet))
       end
 
       def from_ip6tables(opts = {})
-        from_command('ip6tables-save', '-c', opts.merge(family: :inet6))
+        from_system(opts.merge(family: :inet6))
       end
     end
   end
