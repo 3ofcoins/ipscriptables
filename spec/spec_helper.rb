@@ -24,7 +24,7 @@ Wrong.config.alias_assert :expect, override: true
 include Wrong
 
 # Prepare testing environment
-class Minitest::Spec
+class Minitest::Spec            # rubocop:disable ClassAndModuleChildren
   include ::Wrong::Assert
   include ::Wrong::Helpers
 

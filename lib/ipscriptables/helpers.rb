@@ -28,8 +28,8 @@ module IPScriptables
       def setup_ohai
         require 'ohai'
         ohai = Ohai::System.new
-        %w[os platform kernel hostname network ip_scopes network_listeners
-           cloud].each do |plugin|
+        %w(os platform kernel hostname network ip_scopes network_listeners
+           cloud).each do |plugin|
           ohai.require_plugin plugin
         end
         ohai

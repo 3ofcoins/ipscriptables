@@ -26,7 +26,7 @@ module IPScriptables
         .returns(fixture_content)
       rs = Ruleset.from_command('a', 'command', 'with', 'arguments')
       expect { rs.render == fixture_text }
-      expect { rs.command == %w[a command with arguments] }
+      expect { rs.command == %w(a command with arguments) }
     end
 
     it 'has a convenience alias .from_iptables' do
@@ -35,7 +35,7 @@ module IPScriptables
         .returns(fixture_content)
       rs = Ruleset.from_iptables
       expect { rs.render == fixture_text }
-      expect { rs.command == %w[iptables-save -c] }
+      expect { rs.command == %w(iptables-save -c) }
       expect { rs.family == :inet }
     end
 
@@ -45,7 +45,7 @@ module IPScriptables
         .returns(fixture_content)
       rs = Ruleset.from_ip6tables
       expect { rs.render == fixture_text }
-      expect { rs.command == %w[ip6tables-save -c] }
+      expect { rs.command == %w(ip6tables-save -c) }
       expect { rs.family == :inet6 }
     end
   end

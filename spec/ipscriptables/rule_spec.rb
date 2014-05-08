@@ -24,11 +24,11 @@ module IPScriptables
     end
 
     it 'rolls multiple options into arrays' do
-      expect { rule[:m] == %w[tcp multiport] }
+      expect { rule[:m] == %w(tcp multiport) }
     end
 
     it 'has convenience aliases' do
-      expect { rule.match == %w[tcp multiport] }
+      expect { rule.match == %w(tcp multiport) }
       expect { rule.proto == 'tcp' }
       expect { rule.target == 'ACCEPT' }
     end

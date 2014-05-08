@@ -30,15 +30,15 @@ module IPScriptables
       @counters ||= original.counters if original
       @counters ||= [0, 0] if opts[:counters]
 
-      _key = nil
+      key = nil
       Shellwords.shellsplit(rule).each do |word|
         case word
         when /^-+(.*)$/
-          self[_key] = true if _key
-          _key = Regexp.last_match[1].gsub('-', '_')
+          self[key] = true if key
+          key = Regexp.last_match[1].gsub('-', '_')
         else
-          self[_key] = word
-          _key = nil
+          self[key] = word
+          key = nil
         end
       end
     end

@@ -42,7 +42,7 @@ module IPScriptables
     end
 
     def inherit(*names, &block) # rubocop:disable MethodLength
-      fail ValueError, 'Need original to inherit' unless ruleset.original
+      fail 'Need original to inherit' unless ruleset.original
       original_table = ruleset.original[name]
       names = original_table.keys if names.empty?
       names.each do |name|

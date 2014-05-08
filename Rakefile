@@ -16,7 +16,7 @@ end
 desc 'Run Rubocop'
 Rubocop::RakeTask.new(:rubocop) do |t|
   t.fail_on_error = true
-  t.patterns = %w[Rakefile bin/* lib/**/*.rb spec/**/*.rb]
+  t.patterns = %w(Rakefile bin/* lib/**/*.rb spec/**/*.rb)
 end
 
 task :default => [:rubocop, :spec]

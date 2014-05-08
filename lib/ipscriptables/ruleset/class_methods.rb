@@ -14,27 +14,25 @@ module IPScriptables
 
       def from_io(io, opts = {}) # rubocop:disable CyclomaticComplexity, MethodLength, LineLength
         rs = new(opts.merge(skip_builtin_chains: true))
-        _table = nil
+        table = nil
         io.each_line do |ln|
           ln.strip!
           case ln
           when /^#/
             # comment, skip it
           when /^\*(.*)/
-            fail RuntimeError unless _table.nil?
-            _table = rs.table(Regexp.last_match[1])
+            fail RuntimeError unless table.nil?
+            table = rs.table($1)
           when /^:(\w+) (\w+|-) \[(\d+):(\d+)\]$/
-            _table.chain Regexp.last_match[1],
-                         Regexp.last_match[2],
-                         Regexp.last_match[3..4].map(&:to_i)
+            table.chain $1, $2, [$3.to_i, $4.to_i]
           when /^(\[(\d+):(\d+)\] )?-A (\w+) (.*)/
-            ch = _table[Regexp.last_match[4]]
-            rule = Regexp.last_match[5]
-            counters = Regexp.last_match[2..3].map(&:to_i) if Regexp.last_match[1]
+            ch = table[$4]
+            rule = $5
+            counters = [$2.to_i, $3.to_i] if $1
             ch.rule(Rule.new(ch, rule, counters))
           when /^COMMIT$/
-            fail 'COMMIT without table' if _table.nil?
-            _table = nil
+            fail 'COMMIT without table' if table.nil?
+            table = nil
           else
             fail "Cannot parse iptables-save line: #{ln}"
           end

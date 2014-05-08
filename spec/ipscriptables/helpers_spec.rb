@@ -10,19 +10,19 @@ module IPScriptables
     end
 
     it 'runs external command and returns its stdout' do
-      Helpers.expects('systemu').with(%w[echo foo])
+      Helpers.expects('systemu').with(%w(echo foo))
         .returns([mock_status, "foo\n", ''])
       expect { Helpers.run_command('echo', 'foo') == "foo\n" }
     end
 
     it 'raises RuntimError on failure status' do
-      Helpers.expects('systemu').with(%w[false])
+      Helpers.expects('systemu').with(%w(false))
         .returns([mock_status(false), '', ''])
       expect { rescuing { Helpers.run_command('false') }.is_a?(RuntimeError) }
     end
 
     it 'prints command\'s stderr on stderr' do
-      Helpers.expects('systemu').with(%w[cmd])
+      Helpers.expects('systemu').with(%w(cmd))
         .returns([mock_status, "bar\n", "foo\n"])
       out, err = capture_io { @res = Helpers.run_command('cmd') }
       expect { out == '' }
@@ -31,7 +31,7 @@ module IPScriptables
     end
 
     it 'prints stdout on stderr in case of failure' do
-      Helpers.expects('systemu').with(%w[cmd])
+      Helpers.expects('systemu').with(%w(cmd))
         .returns([mock_status(false), "foo\n", ''])
       out, err = capture_io do
         @rescued = rescuing { Helpers.run_command('cmd') }

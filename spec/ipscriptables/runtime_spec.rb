@@ -174,8 +174,8 @@ EOF
 COMMIT
 EOF
 
-        IO.expects(:popen).with(%w[iptables-restore -c], 'w').once.yields(iptables_restore_io)
-        IO.expects(:popen).with(%w[ip6tables-restore -c], 'w').once.yields(ip6tables_restore_io)
+        IO.expects(:popen).with(%w(iptables-restore -c), 'w').once.yields(iptables_restore_io)
+        IO.expects(:popen).with(%w(ip6tables-restore -c), 'w').once.yields(ip6tables_restore_io)
 
         capture_io { @rv = runtime.execute! }
         expect { @err =~ /Running iptables-restore -c/ }
@@ -194,8 +194,8 @@ EOF
         $CHILD_STATUS.expects(:success?)
           .once.returns(false).then.returns(true)
 
-        IO.expects(:popen).with(%w[iptables-restore -c], 'w').once.yields(iptables_restore_io)
-        IO.expects(:popen).with(%w[ip6tables-restore -c], 'w').once.yields(ip6tables_restore_io)
+        IO.expects(:popen).with(%w(iptables-restore -c), 'w').once.yields(iptables_restore_io)
+        IO.expects(:popen).with(%w(ip6tables-restore -c), 'w').once.yields(ip6tables_restore_io)
 
         out, _err = capture_io { @rv = runtime.execute! }
         expect { out.lines.grep(/^\S/).length == 9 }

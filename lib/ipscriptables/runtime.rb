@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# rubocop:disable BlockNesting
 
 require 'English'
 require 'logger'
