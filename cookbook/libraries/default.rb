@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 module IPScriptables
   class ChefHandler < Chef::Handler
     def report
@@ -12,7 +14,7 @@ module IPScriptables
   end
 
   module ChefRecipeDSL
-    def ipscriptables(name=nil, &block)
+    def ipscriptables(name = nil, &block)
       name ||= "#{cookbook_name}::#{recipe_name}::#{_ipscriptables_counter}"
       ipscriptables_rules(name) { rules(&block) }
     end

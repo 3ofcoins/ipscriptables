@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# rubocop:disable LineLength
+
 include_recipe 'ipscriptables-test::prepare'
 
 ipscriptables do

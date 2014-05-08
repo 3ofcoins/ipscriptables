@@ -1,6 +1,8 @@
-_version = node['ipscriptables']['gem_version']
+# -*- coding: utf-8 -*-
+
+gem_version = node['ipscriptables']['gem_version']
 
 chef_gem 'ipscriptables' do
-  version _version if _version && _version != 'latest'
-  action :upgrade if _version == 'latest'
+  version gem_version if gem_version && gem_version != 'latest'
+  action :upgrade if gem_version == 'latest'
 end

@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# rubocop:disable TrivialAccessors
+
 actions :apply
 
 default_action :apply

@@ -1,7 +1,12 @@
 AllCops:
-  Excludes:
+  Exclude:
     - tmp/**
-    - chef-cookbook/**
+
+PerlBackrefs:
+  Enabled: false
+
+SpecialGlobalVars:
+  Enabled: false
 
 Documentation:
   Enabled: false
